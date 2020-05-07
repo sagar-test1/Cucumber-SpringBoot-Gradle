@@ -26,9 +26,30 @@ dependencies {
     compile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.5'
 }
 
-test {
-    useJUnitPlatform()
+
+
+test { 
+    systemProperty "cucumber.options", System.getProperty("cucumber.options") 
+useJUnitPlatform()
 }
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'com.example.demo2', 'src/test/resources']
+        }
+    }
+}
+
 
 
 
